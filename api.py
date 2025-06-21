@@ -28,5 +28,10 @@ api.include_router(storyline_router)
 api.include_router(script_router)
 api.include_router(voice_router)
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    lifespan=lifespan,
+    title="Kahani",
+    summary="Kahani is a multi-agentic system for creating immersive audio-only stories based on user prompts. ",
+    version="1.0.1",
+)
 app.include_router(api)

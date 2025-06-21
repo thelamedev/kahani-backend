@@ -6,7 +6,7 @@ if not SARVAM_API_KEY:
     raise Exception("'SARVAM_API_KEY' not set in the environment")
 
 SARVAM_MODEL = os.getenv("SARVAM_MODEL", "")
-SARVAM_ENDPOINT = ""
+SARVAM_ENDPOINT = "https://api.sarvam.ai/v1/chat/completions"
 
 
 async def sarvam_chat_completion(prompt: str):

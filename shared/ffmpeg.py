@@ -52,9 +52,11 @@ async def merge_audio_files_async(file_paths, output_path):
 
     try:
         # Asynchronously write the list of files to the temporary file
+        silence_path = "./shared/silence_300ms.wav"
         async with aiofiles.open(list_file_path, mode="w", encoding="utf-8") as f:
             for path in file_paths:
                 await f.write(f"file '{os.path.abspath(path)}'\n")
+                await f.write(f"file '{os.path.abspath(silence_path)}'\n")
 
         # Construct the ffmpeg command
         command = [

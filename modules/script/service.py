@@ -16,41 +16,16 @@ The script should be written such that it covers the story can be finished in 3-
 <3> Strictly follow the instructions given above.Don't give any other extra text content other than JSON output. </3>
 <4> Based on character persona and and story , give a voice to each character in the script. the voice model options are given in voice_model_parameters.Accordingly select the voice model for each character. </4>
 <5> All speaker text should be in {language}. Use the appropriate writing script for {language} when generating speaker text. </5>
-<6> the voice of narrator is going to be fixed as "anushka". It should not deviate from this.</6>
-<7> Based on script dialouge and demand for the story , set the voice parameters for each character in the script The parameters are pitch , pace and loudness. these parameters might be different for the same character too at different points of time in the script.
+<6> Based on script dialouge and demand for the story, set the voice parameters for each character in the script The parameters are pitch , pace and loudness. these parameters might be different for the same character too at different points of time in the script.
 You have to think carefully and set the parameters accordingly to make the audio more immersive and engaging. The parameters and their respective value ranges are given in voice_parameters. 
 
 "voice_parameters": {
-    "pitch" : "[-0.75 , 0.75]",
     "pace" : "[0.5 , 2]",
     "loudness" : "[-0.3 , 3]"
 }
 
-Default values for each of these parameters is:
-pitch -> 0
-pace -> 1
-loudness -> 1
-</7>
-<8> Based on script dialouge and demand for the story , set the voice parameters for each character in the script The parameters are pitch , pace and loudness. these parameters might be different for the same character too at different points of time in the scrip.
-You have to think carefully and set the parameters accordingly to make the audio more immersive and engaging. The parameters and their respective value ranges are given in voice_parameters. 
-The "voice_model" parameter in the script should be selected only from the options given in voice_model_parameters.
-
-"voice_model_parameters": {
-    "model_name" : {
-        "female_voice_options":{
-            "manisha",
-            "vidya",
-            "arya"
-        },
-        "male_voice_options":{
-            "abhilash",
-            "karun",
-            "hitesh"
-        }
-    }
-}
-No other voice_model apart from the above options is acceptable.
-</8>
+Default values for pace is 1 and loudness is 1. Use these defaults to adjust your loudness and pitch in the dialouges.
+</6>
 </generation_instructions>
 
 Story Outline:

@@ -53,7 +53,7 @@ async def voice_worker(
             print(e)
 
 
-async def generate_voice_for_script(script: list[dict], language: str):
+async def generate_voice_for_script(script: list[dict], persona: dict, language: str):
     """
     Generate a combines voice set for a script and merge the speaker audio into a single audio sample
     using something like pydub of ffmpeg.
@@ -71,8 +71,9 @@ async def generate_voice_for_script(script: list[dict], language: str):
             "request_id": req_id,
             "language": language,
         }
-        vm = item_with_args["voice_config"].pop("voice_model")
-        item_with_args["voice_config"]["speaker"] = vm
+
+        persona_config = persona[item["speaker"]]["voice_config"]
+        item_with_args["voice_config"].update(persona_config)
         item_with_args["voice_config"]["pace"] = 1
         script_with_ids.append(item_with_args)
 

@@ -23,6 +23,15 @@ Strictly follow the instructions given above.Don't give any other extra text con
 <3>
 personality_trait parameter should not be too long. It should be concise enough to cover key traits of the character.
 </3>
+<4> Based on the character persona, their role in the story and their personality traits, choose the most appropriate voice_config for the persona.
+
+For "voice_config.speaker", your options are as follows (based on the gender of the persona):
+    - female_voice_options: ["manisha", "vidya", "arya"]
+    - male_voice_options: [ "abhilash", "karun", "hitesh"]
+
+Decide the pitch of voice based on your understanding of the role, character and their traits. The pitch can have a value between [-0.75, 0.75], with the default being 0.
+</4>
+<5> Create another persona for the "narrator", in line with the story mood and theme. </5>
 </generation_instructions>
 
 

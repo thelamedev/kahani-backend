@@ -18,11 +18,14 @@ async def request_voice_generation(req: Request):
     script = body.get("script")
     if not script:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "'script' is required")
-
     if not isinstance(script, list):
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST, "'script' should be a list of dialog objects."
         )
+
+    persona = body.get("persona")
+    if not persona:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "'persona' is required")
 
     language = body.get("language")
     if not language:
@@ -30,6 +33,6 @@ async def request_voice_generation(req: Request):
     if language not in LANGUAGE_CODES:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "unknown value for 'language'")
 
-    voice_paths = await generate_voice_for_script(script, language)
+    voice_paths = await generate_voice_for_script(script, persona, language)
 
     return voice_paths

@@ -1,7 +1,7 @@
 from datetime import datetime
 from fastapi import APIRouter
 
-router = APIRouter()
+router = APIRouter(tags=["Root"])
 bootup_time = datetime.now()
 
 

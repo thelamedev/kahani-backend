@@ -3,11 +3,14 @@ from fastapi import APIRouter, HTTPException, Request, status
 
 from modules.script.service import generate_script
 
-router = APIRouter(prefix="/script")
+router = APIRouter(prefix="/script", tags=["Script"])
 logger = logging.getLogger("script.api")
 
 
-@router.post("")
+@router.post(
+    "",
+    description="Create Script with given 'story_outline', 'persona' and 'language'.",
+)
 async def request_script_generation(req: Request):
     body = await req.json()
 

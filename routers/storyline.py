@@ -3,11 +3,14 @@ from fastapi import APIRouter, HTTPException, Request, status
 
 from modules.storyline.service import generate_story_outline
 
-router = APIRouter(prefix="/storyline")
+router = APIRouter(prefix="/storyline", tags=["Storyline"])
 logger = logging.getLogger("storyline.api")
 
 
-@router.post("")
+@router.post(
+    "",
+    description="Create Storyline with given 'user_input'.",
+)
 async def request_storyline_generation(req: Request):
     body = await req.json()
 

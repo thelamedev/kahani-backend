@@ -4,11 +4,14 @@ from fastapi import APIRouter, HTTPException, Request, status
 from modules.voice.service import generate_voice_for_script
 from shared.language_codes import LANGUAGE_CODES
 
-router = APIRouter(prefix="/voice")
+router = APIRouter(prefix="/voice", tags=["Voice"])
 logger = logging.getLogger("voice.api")
 
 
-@router.post("")
+@router.post(
+    "",
+    description="Create Voice with given 'script', 'persona' and 'language'.",
+)
 async def request_voice_generation(req: Request):
     body = await req.json()
 

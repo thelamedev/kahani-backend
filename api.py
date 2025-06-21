@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from shared.database import close_database, connect_database
 
@@ -43,3 +44,5 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(api)
+
+app.mount("/public", StaticFiles(directory="public"), name="public")

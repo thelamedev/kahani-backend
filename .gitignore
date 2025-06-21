@@ -20,3 +20,5 @@ wheels/
 # Logs
 logs/
 ./tmp/
+public/*
+!public/.gitkeep

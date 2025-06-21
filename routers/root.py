@@ -1,8 +1,12 @@
 from datetime import datetime
 from fastapi import APIRouter
+from fastapi.staticfiles import StaticFiles
 
 router = APIRouter(tags=["Root"])
 bootup_time = datetime.now()
+
+
+router.mount("/public", StaticFiles(directory="public"), name="public")
 
 
 @router.get("/health")

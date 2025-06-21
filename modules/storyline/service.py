@@ -14,7 +14,7 @@ The outline should be detailed and should cover the necessary aspects of the sto
 The number of characters should be less than or equal to 4. Story with characters beyond this limit will be unacceptable.
 </1>
 <2>
-The story and plot should be such that the story duration could be between 3-6 minutesThe outline should not be too long.
+The story and plot should be such that the story duration is under 30 minutes.
 </2>
 <3>
 Strictly follow the instructions given above.Don't give any other extra text content other than JSON output.

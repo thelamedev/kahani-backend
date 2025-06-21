@@ -13,18 +13,31 @@ async def sarvam_chat_completion(prompt: str):
     async with aiohttp.ClientSession() as session:
         resp = await session.post(
             SARVAM_ENDPOINT,
-            json={},
+            headers={
+                "api-subscription-key": SARVAM_API_KEY or "",
+                "content-type": "application/json",
+            },
+            json={
+                "model": "sarvam-m",
+                "temperature": 0.8,
+                "max_tokens": 8192,
+                "messages": [
+                    {
+                        "content": prompt,
+                        "role": "user",
+                    },
+                ],
+            },
         )
 
         resp.raise_for_status()
 
         resp_json = await resp.json()
 
+        print(resp_json)
+
         resp_text = (
-            resp_json.get("candidates", [{}])[0]
-            .get("content", {})
-            .get("parts", [{}])[0]
-            .get("text", "")
+            resp_json.get("choices", [{}])[0].get("message", {}).get("content", "")
         )
 
         return resp_text

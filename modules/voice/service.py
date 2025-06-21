@@ -11,6 +11,9 @@ from shared.utils import delete_files_by_pattern
 
 NUM_VOICE_WORKERS = 4
 
+COMPILED_AUDIO_PATH = "./public/"
+TEMP_AUDIO_PATH = "./tmp/"
+
 
 async def voice_worker(
     in_queue: asyncio.Queue,
@@ -25,7 +28,8 @@ async def voice_worker(
                 item = in_queue.get_nowait()
 
             req_id = item["request_id"]
-            item_file_path = f"/tmp/kahani/{req_id}__{item['index']:03}.wav"
+            item_file_path = f"{req_id}__{item['index']:03}.wav"
+            item_file_path = os.path.join(TEMP_AUDIO_PATH, item_file_path)
 
             # generate the voice for this item and save it somewhere for merger
             audio_response = await generate_sarvam_voice(
@@ -84,7 +88,7 @@ async def generate_voice_for_script(script: list[dict], persona: dict, language:
     results_queue = asyncio.Queue()
 
     # Ensure that the result directory is available
-    os.makedirs("/tmp/kahani/compiled", exist_ok=True)
+    os.makedirs(TEMP_AUDIO_PATH, exist_ok=True)
 
     worker_tasks = []
     async with aiohttp.ClientSession() as session:
@@ -121,12 +125,12 @@ async def generate_voice_for_script(script: list[dict], persona: dict, language:
 
     output_file_path = await merge_audio_files_async(
         file_paths,
-        f"/tmp/kahani/compiled/{req_id}_compiled.wav",
+        os.path.join(COMPILED_AUDIO_PATH, f"{req_id}.wav"),
     )
     delete_files_by_pattern(
-        "/tmp/kahani/",
+        TEMP_AUDIO_PATH,
         f"{req_id}_*.wav",
-        dry_run=True,
+        dry_run=False,
     )
 
     return output_file_path

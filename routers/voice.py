@@ -36,6 +36,6 @@ async def request_voice_generation(req: Request):
     if language not in LANGUAGE_CODES:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "unknown value for 'language'")
 
-    voice_paths = await generate_voice_for_script(script, persona, language)
+    voice_path = await generate_voice_for_script(script, persona, language)
 
-    return voice_paths
+    return {"audio_path": voice_path}

@@ -123,9 +123,10 @@ async def generate_voice_for_script(script: list[dict], persona: dict, language:
     if not file_paths:
         raise Exception("failed to generate audio")
 
-    output_file_path = await merge_audio_files_async(
+    compiled_file_path = os.path.join(COMPILED_AUDIO_PATH, f"{req_id}.wav")
+    await merge_audio_files_async(
         file_paths,
-        os.path.join(COMPILED_AUDIO_PATH, f"{req_id}.wav"),
+        compiled_file_path,
     )
     delete_files_by_pattern(
         TEMP_AUDIO_PATH,
@@ -133,4 +134,4 @@ async def generate_voice_for_script(script: list[dict], persona: dict, language:
         dry_run=False,
     )
 
-    return output_file_path
+    return compiled_file_path.strip(".")

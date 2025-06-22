@@ -13,8 +13,8 @@ class VoiceConfig:
 
     # Range: -0.75 to 0.75
     pitch: float = 0.0
-    # Range: 0.3 to 3
-    pace: float = 1.0
+    # Range: 0.3 to 1
+    pace: float = 0.9
     # Range: 0.1 to 3
     loudness: float = 1.0
 

@@ -17,12 +17,39 @@ def format_prompt(prompt: str, args: dict[str, str]):
 
 
 def find_ffmpeg():
-    """Checks if ffmpeg is in the system's PATH and returns its path."""
-    ffmpeg_path = shutil.which("ffmpeg")
+    """Checks if ffmpeg is in the system's PATH and returns its path.
+    Handles both Windows and Unix-like systems.
+    """
+    # For Windows, check for ffmpeg.exe
+    if sys.platform == 'win32':
+        # First check the user's specific installation path
+        user_ffmpeg_path = os.path.expanduser(os.path.join('~', 'ffmpeg', 'bin', 'ffmpeg.exe'))
+        if os.path.isfile(user_ffmpeg_path):
+            return user_ffmpeg_path
+            
+        # Then try the standard which method
+        ffmpeg_path = shutil.which("ffmpeg") or shutil.which("ffmpeg.exe")
+        
+        # If that fails, try common Windows install locations
+        if ffmpeg_path is None:
+            common_paths = [
+                os.path.join(os.environ.get('PROGRAMFILES', 'C:\Program Files'), 'ffmpeg', 'bin', 'ffmpeg.exe'),
+                os.path.join(os.environ.get('PROGRAMFILES(X86)', 'C:\Program Files (x86)'), 'ffmpeg', 'bin', 'ffmpeg.exe'),
+            ]
+            for path in common_paths:
+                if os.path.isfile(path):
+                    ffmpeg_path = path
+                    break
+    else:
+        # For Unix-like systems, use the standard which method
+        ffmpeg_path = shutil.which("ffmpeg")
+    
     if ffmpeg_path is None:
         raise FileNotFoundError(
-            "ffmpeg not found. Please install ffmpeg and ensure it is in your system's PATH."
+            "ffmpeg not found. Please install ffmpeg and ensure it is in your system's PATH. "
+            "On Windows, make sure ffmpeg.exe is properly installed and added to PATH."
         )
+    
     return ffmpeg_path
 
 

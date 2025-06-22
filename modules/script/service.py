@@ -59,7 +59,11 @@ OUTPUT FORMAT for script dialogues:
 """
 
 
-async def generate_script(story_outline: dict, persona: dict, language: str) -> dict:
+async def generate_script(
+    story_outline: dict,
+    persona: dict,
+    language: str,
+) -> list[dict]:
     prompt = format_prompt(
         script_prompt,
         {

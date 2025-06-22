@@ -53,6 +53,9 @@ async def voice_worker(
                 await out_queue.put(item)
         except (asyncio.QueueEmpty, asyncio.QueueShutDown):
             break
+        except aiohttp.ClientResponseError as e:
+            if e.status > 400:
+                break
         except Exception as e:
             print(e)
 
@@ -120,6 +123,9 @@ async def generate_voice_for_script(script: list[dict], persona: dict, language:
         except (asyncio.QueueEmpty, asyncio.QueueShutDown) as e:
             print(e)
             continue
+
+    if len(script_with_ids) != len(output_list):
+        raise Exception("failed to generate some voice samples. Please try again.")
 
     # sorting the list in order of original speech in script
     output_list.sort(key=lambda x: x["index"])

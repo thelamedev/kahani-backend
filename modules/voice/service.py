@@ -84,7 +84,7 @@ async def generate_voice_for_script(script: list[dict], persona: dict, language:
             persona_config = persona[speaker]["voice_config"]
             item_with_args["voice_config"].update(persona_config)
 
-        item_voice_pace = item_with_args["voice_config"]["pace"]
+        item_voice_pace = int(item_with_args["voice_config"]["pace"])
         item_with_args["voice_config"]["pace"] = min(item_voice_pace, 1)
         script_with_ids.append(item_with_args)
 

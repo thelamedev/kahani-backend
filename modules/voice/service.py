@@ -67,6 +67,9 @@ async def generate_voice_for_script(script: list[dict], persona: dict, language:
     read_lock = asyncio.Lock()
     write_lock = asyncio.Lock()
 
+    # easier to match in same case (lowercase)
+    persona = {k.lower(): v for k, v in persona.items()}
+
     script_with_ids = []
     for idx, item in enumerate(script):
         item_with_args = {
@@ -76,9 +79,13 @@ async def generate_voice_for_script(script: list[dict], persona: dict, language:
             "language": language,
         }
 
-        persona_config = persona[item["speaker"]]["voice_config"]
-        item_with_args["voice_config"].update(persona_config)
-        item_with_args["voice_config"]["pace"] = 1
+        speaker = item["speaker"].lower()
+        if speaker in persona:
+            persona_config = persona[speaker]["voice_config"]
+            item_with_args["voice_config"].update(persona_config)
+
+        item_voice_pace = item_with_args["voice_config"]["pace"]
+        item_with_args["voice_config"]["pace"] = min(item_voice_pace, 1)
         script_with_ids.append(item_with_args)
 
     script_queue = asyncio.Queue()

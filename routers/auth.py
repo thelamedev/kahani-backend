@@ -58,6 +58,7 @@ async def register_new_user(
     token = jwt_utils.generate_token(
         {
             "sub": str(user_uid),
+            "email": payload.email,
         }
     )
 
@@ -73,7 +74,9 @@ async def register_new_user(
 @router.post("/login", status_code=status.HTTP_200_OK)
 async def login_user(payload: LoginUserPayload, db: AsyncSession = Depends(get_db)):
     query = (
-        select(User.id, User.password_hash).where(User.email == payload.email).limit(1)
+        select(User.id, User.email, User.password_hash)
+        .where(User.email == payload.email)
+        .limit(1)
     )
     result = await db.execute(query)
 
@@ -81,13 +84,14 @@ async def login_user(payload: LoginUserPayload, db: AsyncSession = Depends(get_d
     if not row:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "invalid credentials")
 
-    user_uid, password_hash = row.tuple()
+    user_uid, user_email, password_hash = row.tuple()
     if not bcrypt.checkpw(payload.password.encode(), password_hash.encode()):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "invalid credentials")
 
     token = jwt_utils.generate_token(
         {
             "sub": str(user_uid),
+            "email": str(user_email),
         }
     )
 
@@ -95,7 +99,7 @@ async def login_user(payload: LoginUserPayload, db: AsyncSession = Depends(get_d
         "token": token,
         "user": {
             "uid": user_uid,
-            "email": payload.email,
+            "email": str(user_email),
         },
     }
 

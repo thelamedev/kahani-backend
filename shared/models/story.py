@@ -1,4 +1,6 @@
+from typing import Any, Dict, List
 from sqlalchemy import UUID, Column, ForeignKey, String, JSON
+from sqlalchemy.orm import Mapped, mapped_column
 from shared.database import Base
 
 
@@ -7,15 +9,15 @@ class Story(Base):
 
     creator_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
     user_input = Column(String)
-    language = Column(String)
+    language: Mapped[str] = mapped_column(String)
 
-    title = Column(String)
-    description = Column(String)
-    audio_src = Column(String)
-    image_src = Column(String)
+    title: Mapped[str] = mapped_column(String)
+    description: Mapped[str] = mapped_column(String)
+    audio_src: Mapped[str] = mapped_column(String)
+    image_src: Mapped[str] = mapped_column(String)
 
     # NOTE: This will be an enum on application layer for now
-    status = Column(String)
+    status: Mapped[str] = mapped_column(String)
 
 
 class Storyline(Base):
@@ -34,7 +36,7 @@ class Storyline(Base):
     resolution = Column(String)
     moral = Column(String)
     style = Column(String)
-    character_personas = Column(JSON)
+    character_personas: Mapped[Dict[str, Any]] = mapped_column(JSON, nullable=True)
 
 
 class Script(Base):
@@ -43,4 +45,4 @@ class Script(Base):
     creator_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
     story_id = Column(UUID(as_uuid=True), ForeignKey("stories.id"))
 
-    dialogues = Column(JSON)
+    dialogues: Mapped[List[Dict[str, Any]]] = mapped_column(JSON, nullable=True)

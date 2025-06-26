@@ -1,8 +1,10 @@
 import logging
+from typing import Annotated
 import uuid
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Request, status
 
 from modules.storyline.service import generate_story_outline
+from routers.dtos.storyline import StorylineRequestPayload
 from shared.auth_middleware import AuthUser, get_current_user
 from shared.database import AsyncSession, get_db
 from shared.models.story import Story, Storyline
@@ -16,25 +18,20 @@ logger = logging.getLogger("storyline.api")
     description="Create Storyline with given 'user_input'.",
 )
 async def request_storyline_generation(
-    req: Request,
+    payload: Annotated[StorylineRequestPayload, Body()],
     current_user: AuthUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    body = await req.json()
-
-    user_input = body.get("user_input")
-    language = body.get("language")
-
-    if not user_input:
+    if not payload.user_input:
         raise HTTPException(status.HTTP_400_BAD_REQUEST)
 
-    storyline = await generate_story_outline(user_input)
+    storyline = await generate_story_outline(payload.user_input)
 
     story = Story(
         id=uuid.uuid4(),
         creator_id=current_user.uid,
-        user_input=user_input,
-        language=language,
+        user_input=payload.user_input,
+        language=payload.language,
         title="",
         description="",
         audio_src="",

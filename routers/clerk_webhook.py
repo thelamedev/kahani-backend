@@ -7,7 +7,7 @@ from shared.database import AsyncSession, get_db
 from shared.models.user import User
 from shared.discord_webhook import send_discord_webhook_message
 
-router = APIRouter(prefix="/clerk")
+router = APIRouter(prefix="/clerk", tags=["Webhook"])
 
 CLERK_WEBHOOK_SECRET = os.getenv("CLERK_WEBHOOK_SECRET")
 if not CLERK_WEBHOOK_SECRET:

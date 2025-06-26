@@ -10,7 +10,7 @@ from shared.database import get_db, AsyncSession
 from shared.models.story import Story
 from shared.pagination import Pagination, get_pagination
 
-router = APIRouter(prefix="/story")
+router = APIRouter(prefix="/story", tags=["Story"])
 
 
 @router.get("/list")

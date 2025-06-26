@@ -10,7 +10,7 @@ from shared.models.user import Subscription, User
 from routers.dtos.auth import LoginUserPayload, RegisterUserPayload
 
 
-router = APIRouter(prefix="/auth")
+router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)

@@ -1,7 +1,7 @@
 import logging
 from typing import Annotated
 import uuid
-from fastapi import APIRouter, Body, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Body, Depends, HTTPException, status
 
 from modules.storyline.service import generate_story_outline
 from routers.dtos.storyline import StorylineRequestPayload

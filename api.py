@@ -13,6 +13,7 @@ from routers.script import router as script_router
 from routers.voice import router as voice_router
 from routers.auth import router as auth_router
 from routers.story import router as story_router
+from routers.clerk_webhook import router as clerk_router
 
 
 @asynccontextmanager
@@ -37,6 +38,7 @@ api.include_router(script_router)
 api.include_router(voice_router)
 api.include_router(auth_router)
 api.include_router(story_router)
+api.include_router(clerk_router)
 
 app = FastAPI(
     lifespan=lifespan,

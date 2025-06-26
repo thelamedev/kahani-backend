@@ -3,7 +3,7 @@ import uuid
 from datetime import datetime
 from sqlalchemy import Column, DateTime
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID
 
 POSTGRES_URI = os.getenv("POSTGRES_URI")
@@ -37,7 +37,7 @@ class Base(DeclarativeBase):
     id = Column(UUID(as_uuid=True), default=uuid.uuid4, primary_key=True, index=True)
 
     created_at = Column(DateTime, default=datetime.now)
-    deleted_at = Column(DateTime, nullable=True, default=None)
+    deleted_at: Mapped[datetime] = mapped_column(DateTime, nullable=True, default=None)
 
 
 # Dependency to get a DB session

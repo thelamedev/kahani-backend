@@ -1,5 +1,5 @@
-from sqlalchemy import UUID, Column, DateTime, ForeignKey, String
-from sqlalchemy.orm import relationship
+from sqlalchemy import UUID, Column, DateTime, Float, ForeignKey, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from shared.database import Base
 
 
@@ -10,6 +10,8 @@ class User(Base):
     last_name = Column(String, nullable=True)
     email = Column(String, unique=True, index=True)
     password_hash = Column(String)
+    source = Column(String)
+    source_id = Column(String)
 
     subscription = relationship("Subscription", back_populates="user")
 
@@ -21,5 +23,6 @@ class Subscription(Base):
 
     display_name = Column(String)
     expires_at = Column(DateTime)
+    credits: Mapped[float] = mapped_column(Float, default=1000.0)
 
     user = relationship("User", back_populates="subscription")

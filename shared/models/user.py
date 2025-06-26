@@ -11,7 +11,7 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     password_hash = Column(String)
     source = Column(String)
-    source_id = Column(String)
+    source_id = Column(String, index=True)
 
     subscription = relationship("Subscription", back_populates="user")
 

@@ -1,5 +1,5 @@
-from datetime import datetime
 import os
+from datetime import datetime
 from fastapi import APIRouter, Depends, Request, Response, status
 from sqlalchemy import select
 
@@ -30,7 +30,6 @@ async def clerk_auth_webhook(
 
     match event_type:
         case "user.created":
-            # TODO: add the created user in the databae without a password, set the source to clerk.
             primary_email_id = event_data["primary_email_address_id"]
             primary_email = list(
                 filter(
@@ -51,7 +50,6 @@ async def clerk_auth_webhook(
 
             webhook_message = f"User Created with email {new_user_doc.email} and user_id {event_data['id']}"
         case "user.updated":
-            # TODO: update the user based on the email and
             primary_email_id = event_data["primary_email_address_id"]
             primary_email = list(
                 filter(
@@ -71,7 +69,6 @@ async def clerk_auth_webhook(
                 webhook_message = f"User Updated with email {user_doc.email} and user_id {user_doc.source_id}"
                 print("User Updated", user_doc, event_data)
         case "user.deleted":
-            # TODO: add the created user in the databae without a password, set the source to clerk.
             deleted = event_data["deleted"]
 
             user_query = select(User).where(User.source_id == event_data["id"])

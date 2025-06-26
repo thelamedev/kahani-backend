@@ -17,6 +17,7 @@ logger = logging.getLogger("voice.api")
 @router.post(
     "",
     description="Create Voice with given 'script', 'persona' and 'language'.",
+    deprecated=True,
 )
 async def request_voice_generation(req: Request):
     body = await req.json()

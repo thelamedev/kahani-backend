@@ -17,6 +17,7 @@ logger = logging.getLogger("script.api")
 @router.post(
     "",
     description="Create Script with given 'story_outline', 'persona' and 'language'.",
+    deprecated=True,
 )
 async def request_script_generation(req: Request):
     body = await req.json()

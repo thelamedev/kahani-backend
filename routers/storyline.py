@@ -14,6 +14,7 @@ logger = logging.getLogger("storyline.api")
 @router.post(
     "",
     description="Create Storyline with given 'user_input'.",
+    deprecated=True,
 )
 async def request_storyline_generation(
     req: Request,

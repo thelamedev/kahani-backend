@@ -16,6 +16,7 @@ logger = logging.getLogger("persona.api")
 @router.post(
     "",
     description="Create character persona. Expects story outline in the body as is.",
+    deprecated=True,
 )
 async def request_persona_generation(req: Request):
     body = await req.json()

@@ -1,10 +1,10 @@
-from typing import Annotated
 import bcrypt
 
 from datetime import datetime, timedelta
-from fastapi import APIRouter, Depends, HTTPException, Header, Response, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from shared import jwt_utils
+from shared.auth_middleware import AuthUser, get_current_user
 from shared.database import AsyncSession, get_db
 from shared.models.user import Subscription, User
 from routers.dtos.auth import LoginUserPayload, RegisterUserPayload
@@ -13,7 +13,7 @@ from routers.dtos.auth import LoginUserPayload, RegisterUserPayload
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
-@router.post("/register", status_code=status.HTTP_201_CREATED)
+@router.post("/register", status_code=status.HTTP_201_CREATED, deprecated=True)
 async def register_new_user(
     payload: RegisterUserPayload,
     db: AsyncSession = Depends(get_db),
@@ -71,7 +71,7 @@ async def register_new_user(
     }
 
 
-@router.post("/login", status_code=status.HTTP_200_OK)
+@router.post("/login", status_code=status.HTTP_200_OK, deprecated=True)
 async def login_user(payload: LoginUserPayload, db: AsyncSession = Depends(get_db)):
     query = (
         select(User.id, User.email, User.password_hash)
@@ -106,32 +106,9 @@ async def login_user(payload: LoginUserPayload, db: AsyncSession = Depends(get_d
 
 @router.get("/verify")
 async def verify_auth(
-    res: Response,
-    authorization: Annotated[str | None, Header(alias="Authorization")],
-    db: AsyncSession = Depends(get_db),
+    current_user: AuthUser = Depends(get_current_user),
 ):
-    if not authorization:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "missing authorization")
-
-    token = authorization.replace("Bearer", "").strip()
-    if not token:
-        raise HTTPException(
-            status.HTTP_401_UNAUTHORIZED, "misformatted authorization header"
-        )
-
-    token_payload = jwt_utils.verify_token(token)
-    if not token_payload:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "invalid or expired token")
-
-    user_id = token_payload.get("sub")
-    if not user_id:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "malformed token")
-
-    query = select(User.id).where(User.id == user_id).limit(1)
-    result = await db.execute(query)
-    user_exists = result.scalars().first()
-    if not user_exists:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
-
-    res.status_code = status.HTTP_204_NO_CONTENT
-    return res
+    return {
+        "message": "Verified",
+        "current_user": current_user.model_dump(),
+    }

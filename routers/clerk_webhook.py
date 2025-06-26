@@ -5,6 +5,7 @@ from sqlalchemy import select
 
 from shared.database import AsyncSession, get_db
 from shared.models.user import User
+from shared.discord_webhook import send_discord_webhook_message
 
 router = APIRouter(prefix="/clerk")
 
@@ -24,6 +25,8 @@ async def clerk_auth_webhook(
 
     event_type = body["type"]
     event_data = body["data"]
+
+    webhook_message = ""
 
     match event_type:
         case "user.created":
@@ -45,6 +48,8 @@ async def clerk_auth_webhook(
             )
 
             db.add(new_user_doc)
+
+            webhook_message = f"User Created with email {new_user_doc.email} and user_id {event_data['id']}"
         case "user.updated":
             # TODO: update the user based on the email and
             primary_email_id = event_data["primary_email_address_id"]
@@ -63,8 +68,8 @@ async def clerk_auth_webhook(
                 user_doc.last_name = event_data["last_name"]
                 user_doc.email = primary_email
                 user_doc.source_id = event_data["id"]
-
-            print("User Updated", user_doc, event_data)
+                webhook_message = f"User Updated with email {user_doc.email} and user_id {user_doc.source_id}"
+                print("User Updated", user_doc, event_data)
         case "user.deleted":
             # TODO: add the created user in the databae without a password, set the source to clerk.
             deleted = event_data["deleted"]
@@ -74,10 +79,12 @@ async def clerk_auth_webhook(
             user_doc = result.scalar_one_or_none()
             if user_doc and deleted:
                 user_doc.deleted_at = datetime.now()
-
-            print("User Deleted", user_doc, event_data)
-            pass
+                webhook_message = f"User Deleted with email {user_doc.email} and user_id {user_doc.source_id}"
+                print("User Deleted", user_doc, event_data)
 
     await db.commit()
+
+    await send_discord_webhook_message(webhook_message, "Kahani (Clerk)")
+
     res.status_code = status.HTTP_200_OK
     return res

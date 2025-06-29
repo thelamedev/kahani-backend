@@ -79,13 +79,12 @@ async def request_persona_generation_for_story(
     persona = await generate_character_person(storyline_dict)
 
     storyline_doc.character_personas = persona
-    story_record.status = "progress:persona"
+    story_record.status = "draft:persona"
 
     await db.commit()
 
     return {
         "message": "Persona created",
         "story_id": story_id,
-        "status": "progress:persona",
         "persona": persona,
     }

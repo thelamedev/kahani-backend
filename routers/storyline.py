@@ -3,6 +3,7 @@ from typing import Annotated
 import uuid
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 
+from modules.metadata.service import generate_metadata_for_storyline
 from modules.storyline.service import generate_story_outline
 from routers.dtos.storyline import StorylineRequestPayload
 from shared.auth_middleware import AuthUser, get_current_user
@@ -26,17 +27,18 @@ async def request_storyline_generation(
         raise HTTPException(status.HTTP_400_BAD_REQUEST)
 
     storyline = await generate_story_outline(payload.user_input)
+    story_metadata = await generate_metadata_for_storyline(storyline, payload.language)
 
     story = Story(
         id=uuid.uuid4(),
         creator_id=current_user.uid,
         user_input=payload.user_input,
         language=payload.language,
-        title="",
-        description="",
+        title=story_metadata.title,
+        description=story_metadata.description,
         audio_src="",
         image_src="",
-        status="progress:storyline",
+        status="draft:storyline",
     )
 
     storyline_doc = Storyline(

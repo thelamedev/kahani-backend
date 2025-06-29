@@ -111,7 +111,7 @@ async def request_script_generation_for_story(
     )
     db.add(script_doc)
 
-    story_record.status = "progress:script"
+    story_record.status = "draft:script"
 
     await db.commit()
 

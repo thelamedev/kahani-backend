@@ -47,7 +47,11 @@ class Base(DeclarativeBase):
     id = Column(UUID(as_uuid=True), default=uuid.uuid4, primary_key=True, index=True)
 
     created_at = Column(DateTime, default=datetime.now)
-    deleted_at: Mapped[datetime] = mapped_column(DateTime, nullable=True, default=None)
+    deleted_at: Mapped[datetime | None] = mapped_column(
+        DateTime,
+        nullable=True,
+        default=None,
+    )
 
 
 # Dependency to get a DB session

@@ -18,6 +18,7 @@ class Story(Base):
 
     # NOTE: This will be an enum on application layer for now
     status: Mapped[str] = mapped_column(String)
+    visibility: Mapped[str] = mapped_column(String, default="private")
 
 
 class Storyline(Base):

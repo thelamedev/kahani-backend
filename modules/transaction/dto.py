@@ -1,9 +1,9 @@
-from enum import Enum
+from enum import IntEnum
 from uuid import UUID
 from pydantic import BaseModel
 
 
-class CREDIT_NEEDS(Enum, int):
+class CREDIT_NEEDS(IntEnum):
     OVERALL = 17
     STORYLINE = 3
     METADATA = 2

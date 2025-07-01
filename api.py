@@ -15,6 +15,7 @@ from routers.auth import router as auth_router
 from routers.story import router as story_router
 from routers.clerk_webhook import router as clerk_router
 from routers.transactions import router as transaction_router
+from routers.user import router as user_router
 
 
 @asynccontextmanager
@@ -41,6 +42,7 @@ api.include_router(auth_router)
 api.include_router(story_router)
 api.include_router(clerk_router)
 api.include_router(transaction_router)
+api.include_router(user_router)
 
 app = FastAPI(
     lifespan=lifespan,

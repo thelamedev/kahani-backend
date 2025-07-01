@@ -3,12 +3,17 @@ from typing import Annotated
 import uuid
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 
+from modules.transaction.dto import CREDIT_NEEDS, CreateTransactionRequest
+from modules.transaction.service import (
+    get_available_credits,
+    update_credits_with_transaction,
+)
 from modules.metadata.service import generate_metadata_for_storyline
 from modules.storyline.service import generate_story_outline
 from routers.dtos.storyline import StorylineRequestPayload
-from shared.auth_middleware import AuthUser, get_current_user
 from shared.database import AsyncSession, get_db
 from shared.models.story import Story, Storyline
+from shared.auth_middleware import AuthUser, get_current_user
 
 router = APIRouter(prefix="/storyline", tags=["Storyline"])
 logger = logging.getLogger("storyline.api")
@@ -25,6 +30,10 @@ async def request_storyline_generation(
 ):
     if not payload.user_input:
         raise HTTPException(status.HTTP_400_BAD_REQUEST)
+
+    available_credits = await get_available_credits(db, current_user.uid)
+    if available_credits < CREDIT_NEEDS.OVERALL:
+        raise HTTPException(status.HTTP_402_PAYMENT_REQUIRED, "insufficient credits")
 
     storyline = await generate_story_outline(payload.user_input)
     story_metadata = await generate_metadata_for_storyline(storyline, payload.language)
@@ -59,6 +68,25 @@ async def request_storyline_generation(
 
     db.add_all([story, storyline_doc])
     await db.commit()
+
+    await update_credits_with_transaction(
+        db,
+        CreateTransactionRequest(
+            user_id=current_user.uid,
+            amount=CREDIT_NEEDS.STORYLINE,
+            remarks="Storyline creation",
+            transaction_ref=str(story.id),
+        ),
+    )
+    await update_credits_with_transaction(
+        db,
+        CreateTransactionRequest(
+            user_id=current_user.uid,
+            amount=CREDIT_NEEDS.METADATA,
+            remarks="Story metadata creation",
+            transaction_ref=str(story.id),
+        ),
+    )
 
     return {
         "story_id": story.id,

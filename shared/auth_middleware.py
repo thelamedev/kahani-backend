@@ -11,6 +11,7 @@ from shared.models import User
 class AuthUser(BaseModel):
     uid: uuid.UUID
     email: str
+    role: str = "user"
 
     @property
     def is_authenticated(self):
@@ -57,7 +58,9 @@ async def basic_scheme(db: AsyncSession, token: str) -> AuthUser:
 
 
 async def verify_user_id(db: AsyncSession, user_id: str) -> AuthUser:
-    user_query = select(User.id, User.email).where(User.source_id == user_id).limit(1)
+    user_query = (
+        select(User.id, User.email, User.role).where(User.source_id == user_id).limit(1)
+    )
     result = await db.execute(user_query)
 
     user_row = result.first()
@@ -69,6 +72,6 @@ async def verify_user_id(db: AsyncSession, user_id: str) -> AuthUser:
 
     result.close()
 
-    user_uuid, user_email = user_row.tuple()
+    user_uuid, user_email, user_role = user_row.tuple()
 
-    return AuthUser(uid=user_uuid, email=user_email)
+    return AuthUser(uid=user_uuid, email=user_email, role=user_role)

@@ -7,6 +7,10 @@ class Pagination(BaseModel):
     limit: int = 10
     user_query: str | None = None
 
+    @property
+    def offset(self):
+        return max((self.page - 1) * self.limit, 0)
+
 
 async def get_pagination(request: Request):
     page_str = request.query_params.get("page", "1")

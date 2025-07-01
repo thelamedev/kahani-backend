@@ -5,6 +5,11 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import select
 
 from modules.script.service import generate_script
+from modules.transaction.dto import CREDIT_NEEDS, CreateTransactionRequest
+from modules.transaction.service import (
+    get_available_credits,
+    update_credits_with_transaction,
+)
 from shared.auth_middleware import AuthUser, get_current_user
 from shared.database import get_db, AsyncSession
 from shared.models.story import Script, Story, Storyline
@@ -52,6 +57,10 @@ async def request_script_generation_for_story(
     current_user: AuthUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    available_credits = await get_available_credits(db, current_user.uid)
+    if available_credits < CREDIT_NEEDS.NARRATIVE:
+        raise HTTPException(status.HTTP_402_PAYMENT_REQUIRED, "insufficient credits")
+
     story_uuid = uuid.UUID(hex=story_id)
     storyline_query = (
         select(Storyline)
@@ -114,6 +123,15 @@ async def request_script_generation_for_story(
     story_record.status = "draft:script"
 
     await db.commit()
+    await update_credits_with_transaction(
+        db,
+        CreateTransactionRequest(
+            user_id=current_user.uid,
+            amount=CREDIT_NEEDS.NARRATIVE,
+            remarks="Story Narrative creation",
+            transaction_ref=story_id,
+        ),
+    )
 
     return {
         "script": script,

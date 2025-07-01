@@ -12,6 +12,7 @@ class User(Base):
     password_hash = Column(String)
     source = Column(String)
     source_id = Column(String, index=True)
+    role: Mapped[str] = mapped_column(String, default="user")
 
     subscription = relationship("Subscription", back_populates="user")
 
@@ -23,6 +24,6 @@ class Subscription(Base):
 
     display_name = Column(String)
     expires_at = Column(DateTime)
-    credits: Mapped[float] = mapped_column(Float, default=1000.0)
+    credits: Mapped[float] = mapped_column(Float, default=20.0)
 
     user = relationship("User", back_populates="subscription")

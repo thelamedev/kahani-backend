@@ -1,10 +1,10 @@
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, Request, Response, status
 from sqlalchemy import select
 
 from shared.database import AsyncSession, get_db
-from shared.models.user import User
+from shared.models.user import Subscription, User
 from shared.discord_webhook import send_discord_webhook_message
 
 router = APIRouter(prefix="/clerk", tags=["Webhook"])
@@ -46,7 +46,13 @@ async def clerk_auth_webhook(
                 source_id=event_data["id"],
             )
 
-            db.add(new_user_doc)
+            new_user_subscription = Subscription(
+                user_id=new_user_doc.id,
+                display_name="Early Adopter",
+                expires_at=datetime.now() + timedelta(days=120),
+            )
+
+            db.add_all([new_user_doc, new_user_subscription])
 
             webhook_message = f"User Created with email {new_user_doc.email} and user_id {event_data['id']}"
         case "user.updated":

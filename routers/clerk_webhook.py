@@ -1,11 +1,15 @@
 import os
 from datetime import datetime, timedelta
+from uuid import UUID
+import uuid
 from fastapi import APIRouter, Depends, Request, Response, status
 from sqlalchemy import select
 
+from modules.transaction.dto import CreateTransactionRequest
 from shared.database import AsyncSession, get_db
 from shared.models.user import Subscription, User
 from shared.discord_webhook import send_discord_webhook_message
+from modules.transaction.service import add_transaction
 
 router = APIRouter(prefix="/clerk", tags=["Webhook"])
 
@@ -37,6 +41,7 @@ async def clerk_auth_webhook(
                     event_data["email_addresses"],
                 )
             )[0]["email_address"]
+
             new_user_doc = User(
                 first_name=event_data["first_name"],
                 last_name=event_data["last_name"],
@@ -50,11 +55,22 @@ async def clerk_auth_webhook(
                 user_id=new_user_doc.id,
                 display_name="Early Adopter",
                 expires_at=datetime.now() + timedelta(days=120),
+                credits=0,
             )
 
             db.add_all([new_user_doc, new_user_subscription])
 
-            webhook_message = f"User Created with email {new_user_doc.email} and user_id {event_data['id']}"
+            user_uid = uuid.UUID(hex=str(new_user_doc.id))
+            await add_transaction(
+                db,
+                CreateTransactionRequest(
+                    user_id=user_uid,
+                    amount=25,
+                    remarks="Welcome credits!",
+                ),
+            )
+
+            webhook_message = f"User Created with email `{new_user_doc.email}` and user_id `{event_data['id']}`"
         case "user.updated":
             primary_email_id = event_data["primary_email_address_id"]
             primary_email = list(
@@ -72,7 +88,7 @@ async def clerk_auth_webhook(
                 user_doc.last_name = event_data["last_name"]
                 user_doc.email = primary_email
                 user_doc.source_id = event_data["id"]
-                webhook_message = f"User Updated with email {user_doc.email} and user_id {user_doc.source_id}"
+                webhook_message = f"User Updated with email `{user_doc.email}` and user_id `{user_doc.source_id}`"
                 print("User Updated", user_doc, event_data)
         case "user.deleted":
             deleted = event_data["deleted"]
@@ -82,7 +98,7 @@ async def clerk_auth_webhook(
             user_doc = result.scalar_one_or_none()
             if user_doc and deleted:
                 user_doc.deleted_at = datetime.now()
-                webhook_message = f"User Deleted with email {user_doc.email} and user_id {user_doc.source_id}"
+                webhook_message = f"User Deleted with email `{user_doc.email}` and user_id `{user_doc.source_id}`"
                 print("User Deleted", user_doc, event_data)
 
     await db.commit()

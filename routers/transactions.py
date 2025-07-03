@@ -42,7 +42,7 @@ async def reset_user_suubscription(
         return {"message": "User subscription already exists"}
 
     create_user_sub = Subscription(
-        user_id=current_user.uid,
+        user_id=user_uid,
         display_name="Early Adopter",
         expires_at=datetime.now() + timedelta(days=120),
     )

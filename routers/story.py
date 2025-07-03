@@ -9,6 +9,7 @@ from routers.dtos.story import UpdateStoryPayload
 from shared.auth_middleware import AuthUser, get_current_user
 from shared.database import get_db, AsyncSession
 from shared.models.story import Story
+from shared.models.user import User
 from shared.pagination import Pagination, get_pagination
 
 router = APIRouter(prefix="/story", tags=["Story"])
@@ -34,13 +35,14 @@ async def list_public_stories(
         )
 
     query = (
-        select(Story)
+        select(Story, User.first_name, User.last_name)
         .where(
             and_(
                 Story.visibility == "public",
                 Story.deleted_at.is_(None),
             )
         )
+        .join(User, Story.creator_id == User.id)
         .order_by(Story.created_at.desc())
         .offset((pagination.page - 1) * pagination.limit)
         .limit(pagination.limit)
@@ -49,7 +51,12 @@ async def list_public_stories(
 
     story_seq = result.all()
 
-    story_list = [story.tuple()[0] for story in story_seq]
+    # story_list = [story.tuple()[0] for story in story_seq]
+    story_list = []
+    for rec in story_seq:
+        doc, fname, lname = rec.tuple()
+
+        story_list.append({**doc.__dict__, "creator": " ".join([fname, lname])})
 
     return {
         "stories": story_list,
